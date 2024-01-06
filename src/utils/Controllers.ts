@@ -1,21 +1,50 @@
-import { response } from "express";
+import formater from "encrypt-with-password";
 import SignControl from "../components/SignControl";
+import GetUsers from "./GetUser";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
+import "dotenv/config";
 class Controller {
     home(res) {
-        res.send("Is Working");
+        res.send("Server Is Started");
     }
     sign(req, res) {
         SignControl(req, res);
     }
-    async get() {
+    get() {
+        return GetUsers();
+    }
+    async login(req) {
+        let data = {
+            username: req.body.username,
+            password: req.body.password,
+        };
+        let func;
         try {
-            return await prisma.akunuser.findMany();
+            await prisma.akunuser
+                .findUnique({
+                    where: {
+                        username: data.username,
+                    },
+                })
+                .then((response) => {
+                    if (
+                        data.password ==
+                        formater.decrypt(response?.password, process.env.SECRET)
+                    ) {
+                        func = true;
+                    } else {
+                        func = false;
+                    }
+                });
         } catch (error) {
-            console.log(error);
+            return false;
         } finally {
-            await prisma.$disconnect;
+            if (func) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 }
