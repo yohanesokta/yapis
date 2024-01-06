@@ -7,12 +7,7 @@ export default function Routes(app) {
         Control.home(res);
     });
     app.post("/sign", (req, res) => {
-        const response = Control.sign(req);
-        if (!response) {
-            res.send("Sign Canceled");
-        } else {
-            res.json(response);
-        }
+        Control.sign(req, res);
     });
     app.get("/get", ({}, res) => {
         Control.get().then((response) => {

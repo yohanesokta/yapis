@@ -7,8 +7,9 @@ export default async function createUser(data) {
         await prisma.akunuser.create({
             data: data,
         });
+        return true;
     } catch (error) {
-        console.log(error);
+        return false;
     } finally {
         await prisma.$disconnect();
     }

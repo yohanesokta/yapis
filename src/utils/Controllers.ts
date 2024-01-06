@@ -1,3 +1,4 @@
+import { response } from "express";
 import SignControl from "../components/SignControl";
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
@@ -5,8 +6,8 @@ class Controller {
     home(res) {
         res.send("Is Working");
     }
-    sign(req) {
-        return SignControl(req);
+    sign(req, res) {
+        SignControl(req, res);
     }
     async get() {
         try {
