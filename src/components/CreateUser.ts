@@ -9,6 +9,7 @@ export default async function createUser(data) {
         });
         return true;
     } catch (error) {
+        console.log(error);
         return false;
     } finally {
         await prisma.$disconnect();

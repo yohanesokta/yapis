@@ -12,7 +12,8 @@ datasource db {
 
 model akunuser {
   id       Int    @id @default(autoincrement())
-  tokens   Json   @default("[]")
+  uuid     String
   username String @unique
   password String
+  tokens   Json   @default("[]")
 }

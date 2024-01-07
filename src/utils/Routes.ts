@@ -10,17 +10,9 @@ export default function Routes(app) {
         Control.sign(req, res);
     });
     app.post("/login", (req, res) => {
-        Control.login(req).then((response) => {
-            if (response) {
-                res.send("BERHASIL LOGIN");
-            } else {
-                res.send("GAGAL LOGIN");
-            }
-        });
+        Control.login(req, res);
     });
     app.get("/get", ({}, res) => {
-        Control.get().then((response) => {
-            res.json(response);
-        });
+        Control.get(res);
     });
 }
