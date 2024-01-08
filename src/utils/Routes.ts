@@ -1,4 +1,3 @@
-import { response } from "express";
 import Controller from "./Controllers";
 const Control = new Controller();
 

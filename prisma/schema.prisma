@@ -11,9 +11,12 @@ datasource db {
 }
 
 model akunuser {
-  id       Int    @id @default(autoincrement())
-  uuid     String
-  username String @unique
-  password String
-  tokens   Json   @default("[]")
+  id           Int    @id @default(autoincrement())
+  uuid         String
+  username     String @unique
+  password     String
+  email        String @default("")
+  name         String @default("")
+  profileImage String @default("")
+  tokens       Json   @default("[]")
 }

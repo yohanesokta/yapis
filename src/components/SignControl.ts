@@ -2,8 +2,10 @@ import formater from "encrypt-with-password";
 import "dotenv/config";
 const secret = process.env.SECRET;
 import createUser from "./CreateUser";
-import { response } from "express";
 import GenerateUUID from "../utils/GenerateUUID";
+import TemplateJSON from "./TemplateJSON";
+
+const sender = new TemplateJSON();
 
 export default function SignControl(req, res) {
     let data = {
@@ -16,12 +18,18 @@ export default function SignControl(req, res) {
         data.password = formater.encrypt(data.password, secret);
         createUser(data).then((response) => {
             if (!response) {
-                res.send("USERNAME NOT VALID");
+                res.json(
+                    sender.info(
+                        "failed",
+                        200,
+                        "request and another data is same"
+                    )
+                );
             } else {
-                res.send("SUCCSESS");
+                res.json(sender.info("success", 200, "successfull"));
             }
         });
     } else {
-        res.send("SIGN CANCEL");
+        res.json(sender.info("cancel", 200, "request not valid"));
     }
 }

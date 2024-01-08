@@ -3,29 +3,48 @@ const prisma = new PrismaClient();
 import "dotenv/config";
 import formater from "encrypt-with-password";
 import GenerateDate from "../utils/GenerateDate";
+import TemplateJSON from "./TemplateJSON";
+import { response } from "express";
+const Sender = new TemplateJSON();
 const date = new Date();
 
 function GenerateTokens() {
     return date.valueOf() + Math.random();
 }
 
-function MakeTokens(data) {
-    const tokens: any = data?.tokens?.valueOf();
+function MakeTokens(response, data) {
+    const tokens: any = response?.tokens?.valueOf();
     const sample = {
-        app: "defaultApp",
+        app: data.app,
         date: GenerateDate(),
         token: GenerateTokens(),
     };
     tokens.push(sample);
     return tokens;
 }
+async function InsertToken(response, data) {
+    try {
+        await prisma.akunuser.update({
+            where: {
+                username: response?.username,
+            },
+            data: {
+                tokens: MakeTokens(response, data),
+            },
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
 
 export default async function LoginControl(req, res) {
     let data = {
         username: req.body.username,
         password: req.body.password,
+        app: req.body.app || "defaultApp",
     };
-    let func;
+    let func, akun;
+    let byToken = true;
     try {
         await prisma.akunuser
             .findUnique({
@@ -34,35 +53,56 @@ export default async function LoginControl(req, res) {
                 },
             })
             .then(async (response) => {
+                akun = response;
                 if (
                     data.password ==
                     formater.decrypt(response?.password, process.env.SECRET)
                 ) {
-                    const data: any = response?.tokens?.valueOf();
-                    if (Object.keys(data).length <= 3) {
-                        await prisma.akunuser.update({
-                            where: {
-                                username: response?.username,
-                            },
-                            data: {
-                                tokens: MakeTokens(response),
-                            },
-                        });
-                        func = true;
+                    const dataUser: any = response?.tokens?.valueOf();
+                    dataUser.forEach((element) => {
+                        console.log(element.app + "|" + data.app);
+                        if (
+                            element.app !== data.app &&
+                            data.app !== undefined
+                        ) {
+                            byToken = true;
+                        } else {
+                            byToken = false;
+                        }
+                    });
+                    if (byToken) {
+                        if (Object.keys(dataUser).length <= 3) {
+                            InsertToken(response, data);
+
+                            func = true;
+                        } else {
+                            func = "tokens is out of value (default 4)";
+                        }
                     } else {
-                        func = "tokens is out of value";
+                        func = "auth is out of number app";
                     }
                 } else {
-                    func = "Login is not Valid!";
+                    func = "login is not valid | use documentasion";
                 }
             });
     } catch (error) {
-        func = "Login is not Valid server!";
+        console.log(error);
+        func = "login failed , server";
     } finally {
         if (func == true) {
-            return true;
+            delete akun.password;
+            delete akun.tokens;
+            res.json(
+                Sender.infoLogin(
+                    "success",
+                    200,
+                    "login successfull",
+                    akun,
+                    GenerateDate()
+                )
+            );
         } else {
-            return func;
+            res.json(Sender.info("failed", 200, func));
         }
     }
 }
