@@ -32,4 +32,4 @@ class TemplateJSON {
     }
 }
 
-export default TemplateJSON;
+export default new TemplateJSON();

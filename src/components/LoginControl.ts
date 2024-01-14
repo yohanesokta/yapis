@@ -5,7 +5,6 @@ import formater from "encrypt-with-password";
 import GenerateDate from "../utils/GenerateDate";
 import TemplateJSON from "./TemplateJSON";
 import { response } from "express";
-const Sender = new TemplateJSON();
 const date = new Date();
 
 function GenerateTokens() {
@@ -22,6 +21,7 @@ function MakeTokens(response, data) {
     tokens.push(sample);
     return tokens;
 }
+
 async function InsertToken(response, data) {
     try {
         await prisma.akunuser.update({
@@ -60,7 +60,6 @@ export default async function LoginControl(req, res) {
                 ) {
                     const dataUser: any = response?.tokens?.valueOf();
                     dataUser.forEach((element) => {
-                        console.log(element.app + "|" + data.app);
                         if (
                             element.app !== data.app &&
                             data.app !== undefined
@@ -76,10 +75,10 @@ export default async function LoginControl(req, res) {
 
                             func = true;
                         } else {
-                            func = "tokens is out of value (default 4)";
+                            func = "Login is out of value (default 4)";
                         }
                     } else {
-                        func = "auth is out of number app";
+                        func = "The application has been logged in";
                     }
                 } else {
                     func = "login is not valid | use documentasion";
@@ -93,7 +92,7 @@ export default async function LoginControl(req, res) {
             delete akun.password;
             delete akun.tokens;
             res.json(
-                Sender.infoLogin(
+                TemplateJSON.infoLogin(
                     "success",
                     200,
                     "login successfull",
@@ -102,7 +101,7 @@ export default async function LoginControl(req, res) {
                 )
             );
         } else {
-            res.json(Sender.info("failed", 200, func));
+            res.json(TemplateJSON.info("failed", 200, func));
         }
     }
 }

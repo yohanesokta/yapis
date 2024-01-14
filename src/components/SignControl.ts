@@ -5,8 +5,6 @@ import createUser from "./CreateUser";
 import GenerateUUID from "../utils/GenerateUUID";
 import TemplateJSON from "./TemplateJSON";
 
-const sender = new TemplateJSON();
-
 export default function SignControl(req, res) {
     let data = {
         uuid: GenerateUUID(),
@@ -19,17 +17,17 @@ export default function SignControl(req, res) {
         createUser(data).then((response) => {
             if (!response) {
                 res.json(
-                    sender.info(
+                    TemplateJSON.info(
                         "failed",
                         200,
                         "request and another data is same"
                     )
                 );
             } else {
-                res.json(sender.info("success", 200, "successfull"));
+                res.json(TemplateJSON.info("success", 200, "successfull"));
             }
         });
     } else {
-        res.json(sender.info("cancel", 200, "request not valid"));
+        res.json(TemplateJSON.info("cancel", 200, "request not valid"));
     }
 }
