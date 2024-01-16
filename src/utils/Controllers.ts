@@ -26,7 +26,7 @@ class Controller {
                 TemplateJSON.infoLogin(
                     response.status,
                     response.code,
-                    "",
+                    response.message,
                     response.data,
                     GenerateDate()
                 )
